@@ -3,135 +3,135 @@ import { WEATHER } from './weather'
 import pauseIcon from './assets/icons/pause.svg'
 
 class App {
-  currentWeather = {}
-  weather
-  
+  currentWeather = {};
+  weather;
+  appContainer;
+  audioPlayer;
+
   constructor(weather) {
-    this.weather = weather;
+      this.weather = weather;
+      this.audioPlayer = document.createElement('audio');
+      this.audioPlayer.id = 'audio-player'; 
+      document.body.appendChild(this.audioPlayer);
   }
 
   setCurrentWeather(id) {
-    this.weather.forEach(elem => {
-      if (elem.id === id) {
-        this.currentWeather = elem;
-      }
-    });
-    this.renderCurrentWeather(); // Обновление интерфейса
+      this.currentWeather = this.weather.find(elem => elem.id === id) || {};
+      console.log(this.currentWeather);
+      this.render();
   }
 
-  render(container) {
-    container.append(this.createApp());
+  render() {
+      if (this.appContainer) {
+          this.appContainer.innerHTML = '';
+      } else {
+          this.appContainer = this.createApp();
+      }
+
+      this.appContainer.append(this.createBackground(), this.createButtonsBlock());
+      return this.appContainer;
   }
 
   createApp() {
-    const appContainer = document.createElement('div');
-    appContainer.classList.add('app-container');
-    appContainer.append(this.createBackground(), this.createButtonsBlock());
-    return appContainer;
+      const appContainer = document.createElement('div');
+      appContainer.classList.add('app-container');
+      return appContainer;
   }
 
   createBackground() {
-    const appBackground = document.createElement('img');
-    appBackground.classList.add('background');
-    appBackground.src = this.currentWeather.img || '';
-    appBackground.style.visibility = this.currentWeather.img ? 'visible' : 'hidden';
-    return appBackground;
+      const appBackground = document.createElement('img');
+      appBackground.classList.add('background');
+      appBackground.src = this.currentWeather.img || '';
+      appBackground.style.visibility = this.currentWeather.img ? 'visible' : 'hidden';
+
+      if (!this.currentWeather.img) {
+          const noDataMessage = document.createElement('p');
+          noDataMessage.textContent = 'Данные о погоде отсутствуют.';
+          appBackground.appendChild(noDataMessage);
+      }
+
+      return appBackground;
   }
 
   createVolumeControl() {
-    const volumeContainer = document.createElement('div');
-    volumeContainer.classList.add('volume-control');
-    
-    const inputVolume = document.createElement('input');
-    inputVolume.type = 'range';
-    inputVolume.id = 'volume';
-    inputVolume.min = 0;
-    inputVolume.max = 100;
-    inputVolume.value = 50;
-    volumeContainer.append(inputVolume);
-    
-    if (this.currentWeather.audio) {
-      const audio = document.createElement('audio');
-      audio.id = 'audio-player';
-      audio.src = this.currentWeather.audio;
-      volumeContainer.append(audio);
-    }
+      const volumeContainer = document.createElement('div');
+      volumeContainer.classList.add('volume-control');
 
+      const inputVolume = document.createElement('input');
+      inputVolume.type = 'range';
+      inputVolume.id = 'volume';
+      inputVolume.min = 0;
+      inputVolume.max = 100;
+      inputVolume.value = 50;
+      volumeContainer.append(inputVolume);
 
-    inputVolume.addEventListener('input', (e) => {
-      const audioPlayer = document.getElementById('audio-player');
-      if (audioPlayer) {
-        audioPlayer.volume = e.target.value / 100;
-      }
-      console.log(audioPlayer?.volume)
-    });
+      this.audioPlayer.volume = inputVolume.value / 100;
 
-    return volumeContainer;
+      inputVolume.addEventListener('input', (e) => {
+          this.audioPlayer.volume = e.target.value / 100;
+          console.log(this.audioPlayer.volume);
+      });
+
+      return volumeContainer;
   }
 
   createButtonsBlock() {
-    const buttonsWrapper = document.createElement('div');
-    buttonsWrapper.classList.add('buttons__wrapper');
+      const buttonsWrapper = document.createElement('div');
+      buttonsWrapper.classList.add('buttons__wrapper');
 
-    const title = document.createElement('h1');
-    title.textContent = 'Weather Sound';
+      const title = document.createElement('h1');
+      title.textContent = 'Weather Sound';
 
-    const buttonContainer = document.createElement('div');
-    buttonContainer.classList.add('buttons__container');
+      const buttonContainer = document.createElement('div');
+      buttonContainer.classList.add('buttons__container');
 
-    this.weather.forEach(elem => buttonContainer.append(this.createButton(elem)));
+      this.weather.forEach(elem => buttonContainer.append(this.createButton(elem)));
 
-    buttonsWrapper.append(title, buttonContainer, this.createVolumeControl());
-    return buttonsWrapper;
+      buttonsWrapper.append(title, buttonContainer, this.createVolumeControl());
+      return buttonsWrapper;
   }
 
   createButton({ id, name, img, icon }) {
-    const button = document.createElement('button');
-    const buttonBg = document.createElement('img');
-    const buttonIcon = document.createElement('img');
+      const button = document.createElement('button');
+      const buttonBg = document.createElement('img');
+      const buttonIcon = document.createElement('img');
 
-    buttonBg.classList.add('background-button');
-    buttonIcon.classList.add('icon-button');
+      buttonBg.classList.add('background-button');
+      buttonIcon.classList.add('icon-button');
 
-    buttonBg.src = img;
-    buttonIcon.src = icon;
+      buttonBg.src = img;
+      buttonIcon.src = icon;
 
-    button.id = id;
-    button.name = name;
-    button.append(buttonBg, buttonIcon);
+      button.id = id;
+      button.name = name;
+      button.append(buttonBg, buttonIcon);
 
-    button.addEventListener('click', this.handleClick.bind(this, id));
-    return button;
+      button.addEventListener('click', this.handleClick.bind(this, id, buttonIcon));
+      return button;
   }
 
-  handleClick(id) {
-    const audioPlayer = document.getElementById('audio-player');
-    if (id === this.currentWeather.id && !audioPlayer.paused ){
-      const audioPlayer = document.getElementById('audio-player');
-      audioPlayer.pause()
-      const button = document.getElementById(id)
-       const icon = button?.lastElementChild
-       icon.src = this.currentWeather.icon
-    } else {
-      id === this.currentWeather.id ? null : this.setCurrentWeather(id);
-      const audioPlayer = document.getElementById('audio-player');
-      const button = document.getElementById(id)
-       const icon = button?.lastElementChild
-       icon.src = pauseIcon
-      audioPlayer.play()
-    }
-    
-  }
+  handleClick(id, buttonIcon) {
 
-  renderCurrentWeather() {
-    const appContainer = document.querySelector('.app-container');
-    if (appContainer) {
-      appContainer.innerHTML = '';
-      appContainer.append(this.createBackground(), this.createButtonsBlock()); 
-    }
+      
+      if (id === this.currentWeather.id) {
+        if(this.audioPlayer.paused){
+          this.audioPlayer.play()
+          buttonIcon.src = pauseIcon
+        } else {
+          buttonIcon.src = this.currentWeather.icon
+          this.audioPlayer.pause();
+        }
+        return
+      }
+
+      this.setCurrentWeather(id);
+      this.audioPlayer.src = this.currentWeather.audio || '';
+      const newIcon = document.getElementById(id)?.lastElementChild
+      newIcon.src = pauseIcon
+      this.audioPlayer.play()
   }
 }
 
 const app = new App(WEATHER);
 const container = document.querySelector('#app');
-app.render(container);
+container?.append(app.render());
