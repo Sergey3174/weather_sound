@@ -17,24 +17,8 @@ body{
   margin: 0;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
 .app-container{
-  position: relative; /* Позволяет использовать абсолютное позиционирование для внутренних элементов */
- /* Ширина 100% от родительского элемента */
- /* Высота на 100% от высоты экрана */
+  position: relative; 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -73,6 +57,19 @@ button {
   overflow: hidden;
   justify-content: center;
   align-items: center;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
 .background-button {
