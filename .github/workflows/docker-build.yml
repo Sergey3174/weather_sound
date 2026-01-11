@@ -28,5 +28,5 @@ jobs:
           context: .
           push: true
           tags: |
-            constmyname/weather_sound:tagname   # твой фиксированный тег
-            constmyname/weather_sound:latest    # тег для Portainer webhook
+            constmyname/weather_sound:tagname
+            constmyname/weather_sound:latest
